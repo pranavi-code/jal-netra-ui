@@ -4,9 +4,9 @@ import { Package, Terminal, Copy, CheckCircle, ExternalLink } from 'lucide-react
 import Navigation from '../components/Navigation';
 import { useTheme } from '../contexts/ThemeContext';
 
-const DockerPage: React.FC = () => {
+const DockerPage = () => {
   const { theme } = useTheme();
-  const [copiedCommand, setCopiedCommand] = useState<string>('');
+  const [copiedCommand, setCopiedCommand] = useState('');
 
   const essentialCommands = [
     {
@@ -31,7 +31,7 @@ const DockerPage: React.FC = () => {
     }
   ];
 
-  const copyToClipboard = async (text: string, commandTitle: string) => {
+  const copyToClipboard = async (text, commandTitle) => {
     try {
       await navigator.clipboard.writeText(text);
       setCopiedCommand(commandTitle);

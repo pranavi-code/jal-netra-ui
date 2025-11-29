@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Waves, Settings, MessageCircle, FileText, Package, Image, User, Moon, Sun, ChevronDown } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
-const Navigation: React.FC = () => {
+const Navigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
@@ -46,7 +46,7 @@ const Navigation: React.FC = () => {
     }
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path) => location.pathname === path;
 
   return (
     <motion.nav

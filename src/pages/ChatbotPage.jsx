@@ -4,16 +4,9 @@ import { Send, Bot, User, Fish, Anchor } from 'lucide-react';
 import Navigation from '../components/Navigation';
 import { useTheme } from '../contexts/ThemeContext';
 
-interface Message {
-  id: string;
-  text: string;
-  sender: 'user' | 'bot';
-  timestamp: Date;
-}
-
-const ChatbotPage: React.FC = () => {
+const ChatbotPage = () => {
   const { theme } = useTheme();
-  const [messages, setMessages] = useState<Message[]>([
+  const [messages, setMessages] = useState([
     {
       id: '1',
       text: 'Welcome to JAL NETRA AI Assistant! I can help you with mission planning, image analysis insights, system guidance, and report generation. How can I assist you today?',
@@ -23,7 +16,7 @@ const ChatbotPage: React.FC = () => {
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -43,11 +36,11 @@ const ChatbotPage: React.FC = () => {
     "System diagnostics complete. All AI modules functioning optimally. Processing speed: 1.8s average.",
   ];
 
-  const handleSendMessage = async (e: React.FormEvent) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!inputValue.trim()) return;
 
-    const userMessage: Message = {
+    const userMessage = {
       id: Date.now().toString(),
       text: inputValue,
       sender: 'user',
@@ -60,7 +53,7 @@ const ChatbotPage: React.FC = () => {
 
     // Simulate bot response delay
     setTimeout(() => {
-      const botMessage: Message = {
+      const botMessage = {
         id: (Date.now() + 1).toString(),
         text: mockResponses[Math.floor(Math.random() * mockResponses.length)],
         sender: 'bot',
@@ -73,7 +66,7 @@ const ChatbotPage: React.FC = () => {
   };
 
   // Background particle component
-  const FloatingParticle = ({ delay = 0 }: { delay?: number }) => (
+  const FloatingParticle = ({ delay = 0 }) => (
     <motion.div
       className="absolute w-1 h-1 bg-cyan-400/20 rounded-full"
       initial={{ 
@@ -95,7 +88,7 @@ const ChatbotPage: React.FC = () => {
     />
   );
 
-  const MessageBubble: React.FC<{ message: Message; index: number }> = ({ message, index }) => {
+  const MessageBubble = ({ message, index }) => {
     const isUser = message.sender === 'user';
     
     return (
@@ -158,7 +151,7 @@ const ChatbotPage: React.FC = () => {
     );
   };
 
-  const TypingIndicator: React.FC = () => (
+  const TypingIndicator = () => (
     <motion.div
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}

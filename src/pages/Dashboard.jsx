@@ -5,8 +5,8 @@ import { Settings, MessageCircle } from 'lucide-react';
 import Navigation from '../components/Navigation';
 import { useTheme } from '../contexts/ThemeContext';
 
-const Dashboard: React.FC = () => {
-  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+const Dashboard = () => {
+  const [hoveredCard, setHoveredCard] = useState(null);
   const { theme } = useTheme();
 
   // Feature cards data
@@ -32,7 +32,7 @@ const Dashboard: React.FC = () => {
   ];
 
   // Background particle component
-  const FloatingParticle = ({ delay = 0 }: { delay?: number }) => (
+  const FloatingParticle = ({ delay = 0 }) => (
     <motion.div
       className="absolute w-1 h-1 bg-cyan-400/30 rounded-full"
       initial={{ 

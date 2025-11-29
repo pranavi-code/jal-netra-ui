@@ -4,29 +4,19 @@ import { Fish, Waves, Zap, Anchor, Shield, Eye, Cpu, Radio } from 'lucide-react'
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 
-interface LoginData {
-  username: string;
-  password: string;
-}
-
-interface SignupData extends LoginData {
-  email: string;
-  confirmPassword: string;
-}
-
-const LandingPage: React.FC = () => {
+const LandingPage = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [showTransition, setShowTransition] = useState(false);
   
-  const [loginData, setLoginData] = useState<LoginData>({ username: '', password: '' });
-  const [signupData, setSignupData] = useState<SignupData>({
+  const [loginData, setLoginData] = useState({ username: '', password: '' });
+  const [signupData, setSignupData] = useState({
     username: '', email: '', password: '', confirmPassword: ''
   });
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     
@@ -42,7 +32,7 @@ const LandingPage: React.FC = () => {
     }, 5000);
   };
 
-  const handleSignup = async (e: React.FormEvent) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     if (signupData.password !== signupData.confirmPassword) {
       alert('Passwords do not match');
@@ -60,7 +50,7 @@ const LandingPage: React.FC = () => {
   };
 
   // Enhanced floating elements
-  const FloatingFish = ({ delay = 0, size = 24, direction = 'right' }: { delay?: number, size?: number, direction?: 'right' | 'left' }) => {
+  const FloatingFish = ({ delay = 0, size = 24, direction = 'right' }) => {
     const startX = direction === 'right' ? -100 : window.innerWidth + 100;
     const endX = direction === 'right' ? window.innerWidth + 100 : -100;
     
@@ -86,7 +76,7 @@ const LandingPage: React.FC = () => {
     );
   };
 
-  const FloatingBubbles = ({ count = 15 }: { count?: number }) => (
+  const FloatingBubbles = ({ count = 15 }) => (
     <>
       {[...Array(count)].map((_, i) => (
         <motion.div

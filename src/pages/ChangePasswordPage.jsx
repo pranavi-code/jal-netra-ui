@@ -5,13 +5,7 @@ import Navigation from '../components/Navigation';
 import { useTheme } from '../contexts/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 
-interface PasswordData {
-  currentPassword: string;
-  newPassword: string;
-  confirmPassword: string;
-}
-
-const ChangePasswordPage: React.FC = () => {
+const ChangePasswordPage = () => {
   const { theme } = useTheme();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +13,7 @@ const ChangePasswordPage: React.FC = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
-  const [passwordData, setPasswordData] = useState<PasswordData>({
+  const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
@@ -34,7 +28,7 @@ const ChangePasswordPage: React.FC = () => {
   });
 
   // Password strength checker
-  const checkPasswordStrength = (password: string) => {
+  const checkPasswordStrength = (password) => {
     setPasswordStrength({
       length: password.length >= 8,
       uppercase: /[A-Z]/.test(password),
@@ -44,7 +38,7 @@ const ChangePasswordPage: React.FC = () => {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (passwordData.newPassword !== passwordData.confirmPassword) {
@@ -68,7 +62,7 @@ const ChangePasswordPage: React.FC = () => {
     navigate('/dashboard');
   };
 
-  const handleInputChange = (field: keyof PasswordData, value: string) => {
+  const handleInputChange = (field, value) => {
     setPasswordData(prev => ({ ...prev, [field]: value }));
     
     if (field === 'newPassword') {
@@ -249,16 +243,16 @@ const ChangePasswordPage: React.FC = () => {
                     ].map((req, index) => (
                       <div key={req.key} className="flex items-center space-x-2">
                         <div className={`w-4 h-4 rounded-full flex items-center justify-center ${
-                          passwordStrength[req.key as keyof typeof passwordStrength]
+                          passwordStrength[req.key]
                             ? theme === 'dark' ? 'bg-green-500' : 'bg-green-600'
                             : theme === 'dark' ? 'bg-slate-600' : 'bg-slate-300'
                         }`}>
-                          {passwordStrength[req.key as keyof typeof passwordStrength] && (
+                          {passwordStrength[req.key] && (
                             <Check size={10} className="text-white" />
                           )}
                         </div>
                         <span className={`${
-                          passwordStrength[req.key as keyof typeof passwordStrength]
+                          passwordStrength[req.key]
                             ? theme === 'dark' ? 'text-green-400' : 'text-green-600'
                             : theme === 'dark' ? 'text-cyan-400/60' : 'text-slate-500'
                         }`}>
