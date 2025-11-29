@@ -1,61 +1,97 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Upload, Download, Sliders, Eye, RotateCcw, Zap } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useDropzone } from 'react-dropzone';
 import Navigation from '../components/Navigation';
 import { useTheme } from '../contexts/ThemeContext';
+import {
+  Upload,
+  RotateCcw,
+  Zap,
+  Settings,
+  Contrast,
+  Sun,
+  Palette,
+  Activity,
+  AlertTriangle
+} from 'lucide-react';
 
 const ImageEnhancementPage = () => {
   const { theme } = useTheme();
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [enhancementSettings, setEnhancementSettings] = useState({
+  const [uploadedImage, setUploadedImage] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [result, setResult] = useState(null);
+  const [settings, setSettings] = useState({
     brightness: 0,
     contrast: 0,
-    gamma: 1,
-    denoise: 0,
-    sharpness: 0
+    saturation: 0,
+    sharpness: 50,
+    noiseReduction: 30,
+    underwaterCorrection: true
   });
-  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleImageUpload = (event) => {
-    const file = event.target.files?.[0];
+  const onDrop = useCallback((acceptedFiles) => {
+    const file = acceptedFiles[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        setSelectedImage(e.target?.result);
+      reader.onload = () => {
+        setUploadedImage(reader.result);
+        setResult(null);
       };
       reader.readAsDataURL(file);
     }
-  };
+  }, []);
 
-  const handleEnhancement = async () => {
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'image/*': ['.jpeg', '.jpg', '.png', '.bmp', '.tiff']
+    },
+    multiple: false
+  });
+
+  const handleEnhance = async () => {
+    if (!uploadedImage) return;
+
     setIsProcessing(true);
-    // Simulate processing time
+    
+    // Simulate processing
     await new Promise(resolve => setTimeout(resolve, 3000));
+
+    const mockResult = {
+      originalImage: uploadedImage,
+      enhancedImage: uploadedImage, // In real app, this would be the processed image
+      settings,
+      metrics: {
+        ssim: 0.892,
+        uqim: 2.347,
+        psnr: 28.45
+      }
+    };
+
+    setResult(mockResult);
     setIsProcessing(false);
   };
 
   const resetSettings = () => {
-    setEnhancementSettings({
+    setSettings({
       brightness: 0,
       contrast: 0,
-      gamma: 1,
-      denoise: 0,
-      sharpness: 0
+      saturation: 0,
+      sharpness: 50,
+      noiseReduction: 30,
+      underwaterCorrection: true
     });
-  };
-
-  const updateSetting = (key, value) => {
-    setEnhancementSettings(prev => ({ ...prev, [key]: value }));
   };
 
   return (
     <div className={`min-h-screen ${
-      theme === 'dark' ? 'bg-underwater-gradient' : 'bg-gradient-to-br from-gray-50 via-white to-blue-50'
+      theme === 'dark' 
+        ? 'bg-underwater-gradient' 
+        : 'bg-gradient-to-br from-slate-50 via-white to-blue-50'
     }`}>
       <Navigation />
-      
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header */}
+        {/* Page Header */}
         <motion.div
           className="text-center mb-8"
           initial={{ opacity: 0, y: 20 }}
@@ -69,182 +105,159 @@ const ImageEnhancementPage = () => {
           }`}>
             Image Enhancement
           </h1>
-          <p className={`${
+          <p className={`max-w-2xl mx-auto ${
             theme === 'dark' ? 'text-cyan-200/70' : 'text-slate-600'
           }`}>
-            Advanced underwater image processing and enhancement
+            Upload underwater images for advanced AI-powered enhancement and clarity recovery
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Upload Area */}
-          <motion.div
-            className="lg:col-span-2"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-          >
-            <div className="underwater-card p-6">
-              <h2 className={`text-xl font-semibold mb-4 ${
-                theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
-              }`}>Image Upload</h2>
-              
-              {!selectedImage ? (
-                <div className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${
-                  theme === 'dark'
-                    ? 'border-cyan-500/30 hover:border-cyan-400/50'
-                    : 'border-slate-300 hover:border-blue-400'
-                }`}>
-                  <Upload className={`mx-auto mb-4 ${
-                    theme === 'dark' ? 'text-cyan-400' : 'text-slate-500'
-                  }`} size={48} />
-                  <p className={`mb-4 ${
-                    theme === 'dark' ? 'text-cyan-300/80' : 'text-slate-600'
-                  }`}>Drop your underwater image here or click to upload</p>
-                  <label className="btn-primary cursor-pointer inline-block">
-                    Choose Image
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <h3 className={`text-sm font-medium mb-2 ${
-                        theme === 'dark' ? 'text-cyan-300' : 'text-slate-700'
-                      }`}>Original</h3>
-                      <img
-                        src={selectedImage}
-                        alt="Original"
-                        className="w-full h-48 object-cover rounded-lg border border-cyan-500/20"
-                      />
-                    </div>
-                    <div>
-                      <h3 className={`text-sm font-medium mb-2 ${
-                        theme === 'dark' ? 'text-cyan-300' : 'text-slate-700'
-                      }`}>Enhanced</h3>
-                      <div className={`w-full h-48 rounded-lg border border-cyan-500/20 flex items-center justify-center ${
-                        theme === 'dark' ? 'bg-deepSea-900/50' : 'bg-slate-100'
-                      }`}>
-                        {isProcessing ? (
-                          <div className="text-center">
-                            <div className="animate-spin w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full mx-auto mb-2"></div>
-                            <p className={`text-sm ${
-                              theme === 'dark' ? 'text-cyan-300' : 'text-slate-600'
-                            }`}>Processing...</p>
-                          </div>
-                        ) : (
-                          <p className={`text-sm ${
-                            theme === 'dark' ? 'text-cyan-400/60' : 'text-slate-500'
-                          }`}>Click enhance to process</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-between">
-                    <button
-                      onClick={() => setSelectedImage(null)}
-                      className="btn-secondary"
-                    >
-                      Upload New Image
-                    </button>
-                    <button
-                      onClick={handleEnhancement}
-                      disabled={isProcessing}
-                      className="btn-primary flex items-center space-x-2"
-                    >
-                      <Zap size={16} />
-                      <span>Enhance Image</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </motion.div>
-
-          {/* Controls */}
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Upload & Controls */}
           <motion.div
             className="space-y-6"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
           >
+            {/* Upload Area */}
             <div className="underwater-card p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className={`text-lg font-semibold ${
-                  theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
-                }`}>Enhancement Settings</h2>
-                <button
-                  onClick={resetSettings}
-                  className="btn-secondary text-xs p-2"
+              <h3 className={`text-xl font-semibold mb-4 flex items-center ${
+                theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
+              }`}>
+                <Upload className="mr-2" size={20} />
+                Image Upload
+              </h3>
+              <div
+                {...getRootProps()}
+                className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-300 ${
+                  isDragActive
+                    ? 'border-cyan-400 bg-cyan-400/10'
+                    : 'border-cyan-500/30 hover:border-cyan-400/50 hover:bg-cyan-400/5'
+                }`}
+              >
+                <input {...getInputProps()} />
+                <motion.div
+                  animate={{
+                    y: isDragActive ? -5 : 0,
+                    scale: isDragActive ? 1.05 : 1
+                  }}
+                  transition={{ type: "spring", stiffness: 300 }}
                 >
-                  <RotateCcw size={14} />
-                </button>
-              </div>
-              
-              <div className="space-y-4">
-                {[
-                  { key: 'brightness', label: 'Brightness', min: -50, max: 50, step: 1 },
-                  { key: 'contrast', label: 'Contrast', min: -50, max: 50, step: 1 },
-                  { key: 'gamma', label: 'Gamma', min: 0.5, max: 2, step: 0.1 },
-                  { key: 'denoise', label: 'Denoise', min: 0, max: 100, step: 1 },
-                  { key: 'sharpness', label: 'Sharpness', min: 0, max: 100, step: 1 }
-                ].map(control => (
-                  <div key={control.key}>
-                    <div className="flex justify-between mb-2">
-                      <label className={`text-sm font-medium ${
-                        theme === 'dark' ? 'text-cyan-300' : 'text-slate-700'
-                      }`}>{control.label}</label>
-                      <span className={`text-sm ${
-                        theme === 'dark' ? 'text-cyan-400' : 'text-slate-600'
-                      }`}>{enhancementSettings[control.key]}</span>
+                  <Upload className={`w-12 h-12 mx-auto mb-4 ${
+                    theme === 'dark' ? 'text-cyan-400' : 'text-blue-500'
+                  }`} />
+                  {uploadedImage ? (
+                    <div className="space-y-2">
+                      <p className={`${theme === 'dark' ? 'text-cyan-200' : 'text-slate-700'}`}>Image uploaded successfully!</p>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-cyan-300/60' : 'text-slate-500'}`}>Click to change image</p>
                     </div>
-                    <input
-                      type="range"
-                      min={control.min}
-                      max={control.max}
-                      step={control.step}
-                      value={enhancementSettings[control.key]}
-                      onChange={(e) => updateSetting(control.key, parseFloat(e.target.value))}
-                      className={`w-full h-2 rounded-lg appearance-none cursor-pointer ${
-                        theme === 'dark'
-                          ? 'bg-deepSea-700 slider-thumb-cyan'
-                          : 'bg-slate-200 slider-thumb-blue'
-                      }`}
+                  ) : isDragActive ? (
+                    <p className={`${theme === 'dark' ? 'text-cyan-200' : 'text-slate-700'}`}>Drop the image here...</p>
+                  ) : (
+                    <div className="space-y-2">
+                      <p className={`${theme === 'dark' ? 'text-cyan-200' : 'text-slate-700'}`}>Drag & drop your underwater image here</p>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-cyan-300/60' : 'text-slate-500'}`}>or click to browse files</p>
+                      <p className={`text-xs ${theme === 'dark' ? 'text-cyan-400/50' : 'text-slate-400'}`}>Supports: JPEG, PNG, BMP, TIFF</p>
+                    </div>
+                  )}
+                </motion.div>
+              </div>
+            </div>
+            {/* Upload Button */}
+            <motion.button
+              onClick={handleEnhance}
+              disabled={!uploadedImage || isProcessing}
+              className="w-full btn-primary text-lg py-4"
+              whileHover={uploadedImage && !isProcessing ? { scale: 1.02 } : {}}
+              whileTap={uploadedImage && !isProcessing ? { scale: 0.98 } : {}}
+            >
+              {isProcessing ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
+                  Processing...
+                </div>
+              ) : (
+                <div className="flex items-center justify-center">
+                  <Activity className="mr-2" size={20} />
+                  Enhance Image
+                </div>
+              )}
+            </motion.button>
+          </motion.div>
+
+        </div>
+
+        {/* Results Section */}
+        <AnimatePresence>
+          {result && (
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="mt-12 space-y-8"
+            >
+              {/* Image Comparison */}
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="underwater-card p-6">
+                  <h3 className={`text-lg font-semibold mb-4 ${
+                    theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
+                  }`}>Original Image</h3>
+                  <div className="aspect-video bg-deepSea-700 rounded-lg overflow-hidden">
+                    <img
+                      src={result.originalImage}
+                      alt="Original"
+                      className="w-full h-full object-cover"
                     />
                   </div>
-                ))}
+                </div>
+                <div className="underwater-card p-6">
+                  <h3 className={`text-lg font-semibold mb-4 ${
+                    theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
+                  }`}>Enhanced Image</h3>
+                  <div className="aspect-video bg-deepSea-700 rounded-lg overflow-hidden">
+                    <img
+                      src={result.enhancedImage}
+                      alt="Enhanced"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-
-            <div className="underwater-card p-6">
-              <h3 className={`text-lg font-semibold mb-4 ${
-                theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
-              }`}>Quick Actions</h3>
-              
-              <div className="space-y-2">
-                <button className="w-full btn-secondary text-left">
-                  <Eye className="inline mr-2" size={16} />
-                  Preview Changes
-                </button>
-                <button className="w-full btn-secondary text-left">
-                  <Download className="inline mr-2" size={16} />
-                  Export Enhanced
-                </button>
-                <button className="w-full btn-secondary text-left">
-                  <Sliders className="inline mr-2" size={16} />
-                  Auto Enhance
-                </button>
+              {/* Quality Metrics Section */}
+              <div className="grid md:grid-cols-3 gap-6">
+                {result && result.metrics && [
+                  { name: 'SSIM', value: result.metrics.ssim.toFixed(3), description: 'Structural Similarity' },
+                  { name: 'UQIM', value: result.metrics.uqim.toFixed(3), description: 'Underwater Quality' },
+                  { name: 'PSNR', value: `${result.metrics.psnr.toFixed(1)} dB`, description: 'Peak Signal-to-Noise' }
+                ].map((metric, index) => (
+                  <motion.div
+                    key={metric.name}
+                    className={`underwater-card p-6 text-center ${
+                      theme === 'dark' 
+                        ? 'bg-gradient-to-br from-deepSea-800/50 to-deepSea-700/30' 
+                        : 'bg-gradient-to-br from-white to-slate-50'
+                    }`}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 1 + index * 0.1, duration: 0.5 }}
+                    whileHover={{ y: -5 }}
+                  >
+                    <div className={`text-3xl font-bold mb-1 ${
+                      theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
+                    }`}>{metric.name}</div>
+                    <div className={`text-lg font-semibold mb-1 ${
+                      theme === 'dark' ? 'text-cyan-200' : 'text-slate-700'
+                    }`}>{metric.value}</div>
+                    <div className={`text-sm ${
+                      theme === 'dark' ? 'text-cyan-300/60' : 'text-slate-500'
+                    }`}>{metric.description}</div>
+                  </motion.div>
+                )) || null}
               </div>
-            </div>
-          </motion.div>
-        </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
