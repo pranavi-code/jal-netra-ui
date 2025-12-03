@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from 'react';
+﻿import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDropzone } from 'react-dropzone';
-import { Upload, Image as ImageIcon, CheckCircle, AlertCircle, Activity, TrendingUp } from 'lucide-react';
+import { Upload, CheckCircle, Activity } from 'lucide-react';
 import Navigation from '../components/Navigation';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -51,16 +51,14 @@ const OperationsConsole = () => {
       prevSteps.map(step => ({ ...step, status: 'completed' }))
     );
 
-    // Set mock result
+    // Set mock result (lower quality metrics to indicate poorer quality)
     setResult({
       originalImage: uploadedImage,
       enhancedImage: uploadedImage,
-      threats: ['Submarine contact detected at bearing 045°', 'Unidentified metallic object at depth 120m'],
-      enhancement: 'Brightness +15%, Contrast +20%, Gamma 1.2, Noise Reduction Applied',
       metrics: {
-        ssim: 0.87,
-        uqim: 3.42,
-        psnr: 24.8
+        ssim: 0.45,
+        uqim: 1.12,
+        psnr: 14.32
       }
     });
 
@@ -288,13 +286,9 @@ const OperationsConsole = () => {
                       />
                     </div>
                   </div>
-
-                  <p className={`text-sm mt-3 ${
-                    theme === 'dark' ? 'text-cyan-300/80' : 'text-slate-600'
-                  }`}>{result.enhancement}</p>
                 </div>
 
-                {/* Metrics and Threats */}
+                {/* Metrics */}
                 <div className="space-y-6">
                   {/* Quality Metrics */}
                   <div>
@@ -319,22 +313,6 @@ const OperationsConsole = () => {
                     </div>
                   </div>
 
-                  {/* Threats */}
-                  <div>
-                    <h3 className={`text-lg font-medium mb-4 ${
-                      theme === 'dark' ? 'text-cyan-200' : 'text-slate-700'
-                    }`}>Threats Detected</h3>
-                    <div className="space-y-2">
-                      {result.threats.map((threat, index) => (
-                        <div key={index} className="flex items-start space-x-2">
-                          <AlertCircle size={16} className="text-red-400 mt-0.5 flex-shrink-0" />
-                          <span className={`text-sm ${
-                            theme === 'dark' ? 'text-red-300' : 'text-red-600'
-                          }`}>{threat}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
                 </div>
               </div>
             </motion.div>
