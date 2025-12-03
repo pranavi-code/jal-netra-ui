@@ -96,7 +96,7 @@ const OperationsConsole = () => {
 
   return (
     <div className={`min-h-screen ${
-      theme === 'dark' ? 'bg-underwater-gradient' : 'bg-gradient-to-br from-slate-50 via-white to-blue-50'
+      theme === 'dark' ? 'bg-transparent' : 'bg-white/10'
     }`}>
       <Navigation />
       
@@ -134,53 +134,99 @@ const OperationsConsole = () => {
               theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
             }`}>Image Upload</h2>
 
-            <div {...getRootProps()} className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
-              isDragActive
-                ? theme === 'dark'
-                  ? 'border-cyan-400 bg-cyan-400/10'
-                  : 'border-blue-400 bg-blue-50'
-                : theme === 'dark'
-                  ? 'border-cyan-500/30 hover:border-cyan-400/50'
-                  : 'border-slate-300 hover:border-blue-400'
-            }`}>
-              <input {...getInputProps()} />
-              <Upload className={`mx-auto mb-4 ${
-                theme === 'dark' ? 'text-cyan-400' : 'text-slate-500'
-              }`} size={48} />
-              <p className={`mb-2 ${
-                theme === 'dark' ? 'text-cyan-300' : 'text-slate-700'
-              }`}>
-                {isDragActive ? 'Drop the image here' : 'Drag & drop an underwater image here'}
-              </p>
-              <p className={`text-sm ${
-                theme === 'dark' ? 'text-cyan-400/60' : 'text-slate-500'
-              }`}>
-                or click to browse files
-              </p>
+            <div className="flex-1 flex flex-col justify-center">
+              {!uploadedImage ? (
+                <div {...getRootProps()} className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors cursor-pointer flex flex-col items-center justify-center h-full ${
+                  isDragActive
+                    ? theme === 'dark'
+                      ? 'border-cyan-400 bg-cyan-400/10'
+                      : 'border-blue-400 bg-blue-50'
+                    : theme === 'dark'
+                      ? 'border-cyan-500/30 hover:border-cyan-400/50'
+                      : 'border-slate-300 hover:border-blue-400'
+                }`}>
+                  <input {...getInputProps()} />
+                  <Upload className={`mx-auto mb-4 ${
+                    theme === 'dark' ? 'text-cyan-400' : 'text-slate-500'
+                  }`} size={48} />
+                  <p className={`mb-4 ${
+                    theme === 'dark' ? 'text-cyan-300/80' : 'text-slate-600'
+                  }`}>Drop your underwater image here or click to upload</p>
+                  <label className="btn-primary cursor-pointer inline-block">
+                    Choose Image
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (event) => {
+                            setUploadedImage(event.target.result);
+                            setResult(null);
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <h3 className={`text-sm font-medium mb-2 ${
+                        theme === 'dark' ? 'text-cyan-300' : 'text-slate-700'
+                      }`}>Original</h3>
+                      <img
+                        src={uploadedImage}
+                        alt="Original"
+                        className="w-full h-48 object-cover rounded-lg border border-cyan-500/20"
+                      />
+                    </div>
+                    <div>
+                      <h3 className={`text-sm font-medium mb-2 ${
+                        theme === 'dark' ? 'text-cyan-300' : 'text-slate-700'
+                      }`}>Enhanced</h3>
+                      <div className={`w-full h-48 rounded-lg border border-cyan-500/20 flex items-center justify-center ${
+                        theme === 'dark' ? 'bg-deepSea-900/50' : 'bg-slate-100'
+                      }`}>
+                        {isProcessing ? (
+                          <div className="text-center">
+                            <div className="animate-spin w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full mx-auto mb-2"></div>
+                            <p className={`text-sm ${
+                              theme === 'dark' ? 'text-cyan-300' : 'text-slate-600'
+                            }`}>Processing...</p>
+                          </div>
+                        ) : (
+                          <p className={`text-sm ${
+                            theme === 'dark' ? 'text-cyan-400/60' : 'text-slate-500'
+                          }`}>Click process to enhance</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <button
+                      onClick={() => setUploadedImage(null)}
+                      className="btn-secondary"
+                    >
+                      Upload New Image
+                    </button>
+                    <button
+                      onClick={processImage}
+                      disabled={isProcessing}
+                      className="btn-primary flex items-center space-x-2"
+                    >
+                      <Activity size={16} />
+                      <span>Start Analysis</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-
-            {uploadedImage && (
-              <motion.div
-                className="mt-6"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4 }}
-              >
-                <img
-                  src={uploadedImage}
-                  alt="Uploaded"
-                  className="w-full h-48 object-cover rounded-lg border border-cyan-500/20 mb-4"
-                />
-                <button
-                  onClick={processImage}
-                  disabled={isProcessing}
-                  className="w-full btn-primary flex items-center justify-center space-x-2"
-                >
-                  <Activity size={18} />
-                  <span>{isProcessing ? 'Processing...' : 'Start Analysis'}</span>
-                </button>
-              </motion.div>
-            )}
           </motion.div>
 
           {/* Processing Steps */}
@@ -257,63 +303,59 @@ const OperationsConsole = () => {
                 theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
               }`}>Analysis Results</h2>
 
-              <div className="grid lg:grid-cols-2 gap-8">
-                {/* Images Comparison */}
-                <div>
-                  <h3 className={`text-lg font-medium mb-4 ${
-                    theme === 'dark' ? 'text-cyan-200' : 'text-slate-700'
-                  }`}>Image Enhancement</h3>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className={`text-sm mb-2 ${
-                        theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'
-                      }`}>Original</p>
+              {/* Images Comparison - Full Width */}
+              <div className="mb-8">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="text-center">
+                    <p className={`text-sm mb-2 ${
+                      theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'
+                    }`}>Original</p>
+                    <div className="w-full h-64 rounded-lg overflow-hidden border border-cyan-500/20">
                       <img
                         src={result.originalImage}
                         alt="Original"
-                        className="w-full h-32 object-cover rounded border border-cyan-500/20"
+                        className="w-full h-full object-cover"
                       />
                     </div>
-                    <div>
-                      <p className={`text-sm mb-2 ${
-                        theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'
-                      }`}>Enhanced</p>
+                  </div>
+                  <div className="text-center">
+                    <p className={`text-sm mb-2 ${
+                      theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'
+                    }`}>Enhanced</p>
+                    <div className="w-full h-64 rounded-lg overflow-hidden border border-cyan-500/20">
                       <img
                         src={result.enhancedImage}
                         alt="Enhanced"
-                        className="w-full h-32 object-cover rounded border border-cyan-500/20"
+                        className="w-full h-full object-cover"
                       />
                     </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Metrics */}
-                <div className="space-y-6">
-                  {/* Quality Metrics */}
-                  <div>
-                    <h3 className={`text-lg font-medium mb-4 ${
-                      theme === 'dark' ? 'text-cyan-200' : 'text-slate-700'
-                    }`}>Quality Metrics</h3>
-                    <div className="space-y-3">
-                      {[
-                        { label: 'SSIM', value: result.metrics.ssim, unit: '', color: 'text-green-400' },
-                        { label: 'UQIM', value: result.metrics.uqim, unit: '', color: 'text-blue-400' },
-                        { label: 'PSNR', value: result.metrics.psnr, unit: 'dB', color: 'text-yellow-400' }
-                      ].map((metric) => (
-                        <div key={metric.label} className="flex justify-between items-center">
-                          <span className={`text-sm ${
-                            theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'
-                          }`}>{metric.label}</span>
-                          <span className={`font-mono ${metric.color}`}>
-                            {metric.value.toFixed(2)}{metric.unit}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+              {/* Metrics Cards - Three Columns */}
+              <div className="grid grid-cols-3 gap-4">
+                {[
+                  { label: 'SSIM', value: result.metrics.ssim, unit: '', color: 'text-green-400' },
+                  { label: 'UQIM', value: result.metrics.uqim, unit: '', color: 'text-blue-400' },
+                  { label: 'PSNR', value: result.metrics.psnr, unit: 'dB', color: 'text-yellow-400' }
+                ].map((metric) => (
+                  <div
+                    key={metric.label}
+                    className={`p-6 rounded-lg border text-center ${
+                      theme === 'dark'
+                        ? 'border-slate-700 bg-slate-800/40'
+                        : 'border-slate-200 bg-white/60'
+                    }`}
+                  >
+                    <p className={`text-sm mb-2 ${
+                      theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'
+                    }`}>{metric.label}</p>
+                    <p className={`text-2xl font-mono font-bold ${metric.color}`}>
+                      {metric.value.toFixed(2)}{metric.unit}
+                    </p>
                   </div>
-
-                </div>
+                ))}
               </div>
             </motion.div>
           )}
@@ -323,4 +365,4 @@ const OperationsConsole = () => {
   );
 };
 
-export default OperationsConsole;
+export default OperationsConsole; 

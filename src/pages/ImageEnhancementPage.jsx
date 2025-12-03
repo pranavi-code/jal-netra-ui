@@ -86,7 +86,7 @@ const ImageEnhancementPage = () => {
 
   return (
     <div className={`min-h-screen ${
-      theme === 'dark' ? 'bg-underwater-gradient' : 'bg-gradient-to-br from-gray-50 via-white to-blue-50'
+      theme === 'dark' ? 'bg-transparent' : 'bg-white/10'
     }`}>
       <Navigation />
       
@@ -112,14 +112,14 @@ const ImageEnhancementPage = () => {
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-8 mt-16">
           {/* Upload Area */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
           >
-            <div className="underwater-card p-6">
+            <div className="underwater-card p-6 opacity-90">
               <h2 className={`text-xl font-semibold mb-4 ${
                 theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
               }`}>Image Upload</h2>
@@ -207,7 +207,7 @@ const ImageEnhancementPage = () => {
 
           {/* Processing Pipeline */}
           <motion.div
-            className="underwater-card p-6"
+            className="underwater-card p-6 opacity-90"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
@@ -267,44 +267,44 @@ const ImageEnhancementPage = () => {
           {/* Results Section */}
           {result && (
             <motion.div
-              className="underwater-card p-6"
+              className="underwater-card p-8 lg:col-span-2 opacity-90"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
             >
-              <h2 className={`text-xl font-semibold mb-6 ${theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'}`}>Analysis Results</h2>
+              <h2 className={`text-xl font-semibold mb-8 ${theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'}`}>Analysis Results</h2>
 
-              <div className="max-w-5xl mx-auto">
+              <div className="max-w-screen-xl mx-auto">
                 {/* Images row - centered, equal size */}
-                <div className="flex gap-6 mb-6">
+                <div className="flex gap-8 mb-8">
                   <div className="flex-1 flex flex-col items-center">
-                    <p className={`text-sm mb-2 text-center ${theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'}`}>Original</p>
-                    <div className="w-full rounded overflow-hidden border border-cyan-500/20 h-64 flex items-center justify-center">
+                    <p className={`text-sm mb-3 text-center ${theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'}`}>Original</p>
+                    <div className="w-full rounded-lg overflow-hidden border border-cyan-500/20 h-80 flex items-center justify-center">
                       <img src={result.originalImage} alt="Original" className="w-full h-full object-cover" />
                     </div>
                   </div>
 
                   <div className="flex-1 flex flex-col items-center">
-                    <p className={`text-sm mb-2 text-center ${theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'}`}>Enhanced</p>
-                    <div className="w-full rounded overflow-hidden border border-cyan-500/20 h-64 flex items-center justify-center">
+                    <p className={`text-sm mb-3 text-center ${theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'}`}>Enhanced</p>
+                    <div className="w-full rounded-lg overflow-hidden border border-cyan-500/20 h-80 flex items-center justify-center">
                       <img src={result.enhancedImage} alt="Enhanced" className="w-full h-full object-cover" />
                     </div>
                   </div>
                 </div>
 
                 {/* Metrics row - three equal columns, centered */}
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div className={`p-4 rounded border ${theme === 'dark' ? 'border-slate-700 bg-slate-800/40' : 'border-slate-200 bg-white/60'} flex flex-col items-center justify-center`}>
-                    <span className={`text-sm mb-2 ${theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'}`}>SSIM</span>
-                    <span className="font-mono text-2xl text-green-400">{result.metrics.ssim.toFixed(2)}</span>
+                <div className="grid grid-cols-3 gap-6 text-center">
+                  <div className={`p-6 rounded-lg border ${theme === 'dark' ? 'border-slate-700 bg-slate-800/40' : 'border-slate-200 bg-white/60'} flex flex-col items-center justify-center`}>
+                    <span className={`text-sm mb-3 ${theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'}`}>SSIM</span>
+                    <span className="font-mono text-3xl font-bold text-green-400">{result.metrics.ssim.toFixed(2)}</span>
                   </div>
-                  <div className={`p-4 rounded border ${theme === 'dark' ? 'border-slate-700 bg-slate-800/40' : 'border-slate-200 bg-white/60'} flex flex-col items-center justify-center`}>
-                    <span className={`text-sm mb-2 ${theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'}`}>UQIM</span>
-                    <span className="font-mono text-2xl text-blue-400">{result.metrics.uqim.toFixed(2)}</span>
+                  <div className={`p-6 rounded-lg border ${theme === 'dark' ? 'border-slate-700 bg-slate-800/40' : 'border-slate-200 bg-white/60'} flex flex-col items-center justify-center`}>
+                    <span className={`text-sm mb-3 ${theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'}`}>UQIM</span>
+                    <span className="font-mono text-3xl font-bold text-blue-400">{result.metrics.uqim.toFixed(2)}</span>
                   </div>
-                  <div className={`p-4 rounded border ${theme === 'dark' ? 'border-slate-700 bg-slate-800/40' : 'border-slate-200 bg-white/60'} flex flex-col items-center justify-center`}>
-                    <span className={`text-sm mb-2 ${theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'}`}>PSNR</span>
-                    <span className="font-mono text-2xl text-yellow-400">{result.metrics.psnr.toFixed(2)} dB</span>
+                  <div className={`p-6 rounded-lg border ${theme === 'dark' ? 'border-slate-700 bg-slate-800/40' : 'border-slate-200 bg-white/60'} flex flex-col items-center justify-center`}>
+                    <span className={`text-sm mb-3 ${theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'}`}>PSNR</span>
+                    <span className="font-mono text-3xl font-bold text-yellow-400">{result.metrics.psnr.toFixed(2)} dB</span>
                   </div>
                 </div>
               </div>

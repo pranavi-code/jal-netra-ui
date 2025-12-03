@@ -187,7 +187,7 @@ const ChatbotPage = () => {
 
   return (
     <div className={`min-h-screen relative overflow-hidden ${
-      theme === 'dark' ? 'bg-underwater-gradient' : 'bg-gradient-to-br from-gray-50 via-white to-blue-50'
+      theme === 'dark' ? 'bg-underwater-gradient' : 'bg-light-underwater-gradient'
     }`}>
       <Navigation />
       

@@ -324,7 +324,7 @@ const LandingPage = () => {
 
   return (
     <div className={`min-h-screen relative overflow-hidden ${
-      theme === 'dark' ? 'bg-underwater-gradient' : 'bg-gradient-to-br from-blue-50 via-white to-gray-50'
+      theme === 'dark' ? 'bg-underwater-gradient' : 'bg-light-underwater-gradient'
     }`}>
       {/* Enhanced Background Effects */}
       <div className="absolute inset-0 overflow-hidden">

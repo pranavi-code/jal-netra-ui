@@ -97,7 +97,7 @@ const LogsPage = () => {
 
   return (
     <div className={`min-h-screen ${
-      theme === 'dark' ? 'bg-underwater-gradient' : 'bg-gradient-to-br from-slate-50 via-white to-blue-50'
+      theme === 'dark' ? 'bg-underwater-gradient' : 'bg-light-underwater-gradient'
     }`}>
       <Navigation />
       
