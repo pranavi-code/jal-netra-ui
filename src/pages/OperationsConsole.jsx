@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from 'react';
+﻿import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDropzone } from 'react-dropzone';
-import { Upload, Image as ImageIcon, CheckCircle, AlertCircle, Activity, TrendingUp } from 'lucide-react';
+import { Upload, CheckCircle, Activity } from 'lucide-react';
 import Navigation from '../components/Navigation';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -32,24 +32,34 @@ const OperationsConsole = () => {
     for (let i = 0; i < processingSteps.length; i++) {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      setProcessingSteps(steps => 
-        steps.map((step, index) => ({
-          ...step,
-          status: index <= i ? 'completed' : index === i + 1 ? 'active' : 'pending'
-        }))
+      setProcessingSteps(prevSteps =>
+        prevSteps.map(step =>
+          step.id === stepId
+            ? { ...step, status: 'active' }
+            : step.status === 'active'
+            ? { ...step, status: 'completed' }
+            : step
+        )
       );
+
+      await new Promise(resolve => setTimeout(resolve, 1500));
     }
 
-    // Mock result
-    const mockResult = {
+    // Final completion
+    setProcessingSteps(prevSteps =>
+      prevSteps.map(step => ({ ...step, status: 'completed' }))
+    );
+
+    // Set mock result
+    setResult({
       originalImage: uploadedImage,
-      enhancedImage: uploadedImage, // In real app, this would be the processed image
-      threats: ['Submarine contact detected at depth 150m, bearing 045°', 'Unidentified metallic object located in sector B-3'],
-      enhancement: 'Underwater image processing completed successfully. Enhanced visibility and contrast applied to improve object detection capabilities.',
+      enhancedImage: uploadedImage,
+      threats: ['Submarine contact detected at bearing 045°', 'Unidentified metallic object at depth 120m'],
+      enhancement: 'Brightness +15%, Contrast +20%, Gamma 1.2, Noise Reduction Applied',
       metrics: {
-        ssim: 0.892,
-        uqim: 2.347,
-        psnr: 28.45
+        ssim: 0.87,
+        uqim: 3.42,
+        psnr: 24.8
       }
     };
 
@@ -309,40 +319,37 @@ const OperationsConsole = () => {
                     <div className="absolute top-4 left-4 w-16 h-16 border-2 border-red-400 bg-red-400/20 rounded"></div>
                     <div className="absolute bottom-8 right-8 w-20 h-12 border-2 border-orange-400 bg-orange-400/20 rounded"></div>
                   </div>
-                </div>
-              </div>
 
-              {/* Analysis Summary */}
-              <div className="underwater-card p-6">
-                <h3 className={`text-lg font-semibold mb-4 flex items-center ${
-                  theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
-                }`}>
-                  <AlertCircle className="mr-2" size={20} />
-                  Analysis Summary
-                </h3>
-                <div className="grid md:grid-cols-2 gap-6">
+                  <p className={`text-sm mt-3 ${
+                    theme === 'dark' ? 'text-cyan-300/80' : 'text-slate-600'
+                  }`}>{result.enhancement}</p>
+                </div>
+
+                {/* Metrics and Threats */}
+                <div className="space-y-6">
+                  {/* Quality Metrics */}
                   <div>
                     <h4 className={`font-medium mb-2 ${
                       theme === 'dark' ? 'text-cyan-200' : 'text-slate-700'
                     }`}>Enhancement Quality</h4>
                     <p className={`${theme === 'dark' ? 'text-cyan-300/80' : 'text-slate-600'}`}>{result.enhancement}</p>
                   </div>
+
+                  {/* Threats */}
                   <div>
-                    <h4 className={`font-medium mb-2 ${
+                    <h3 className={`text-lg font-medium mb-4 ${
                       theme === 'dark' ? 'text-cyan-200' : 'text-slate-700'
-                    }`}>Threats Detected</h4>
-                    <ul className="space-y-1">
+                    }`}>Threats Detected</h3>
+                    <div className="space-y-2">
                       {result.threats.map((threat, index) => (
-                        <li key={index} className={`flex items-start ${
-                          theme === 'dark' ? 'text-cyan-300/80' : 'text-slate-600'
-                        }`}>
-                          <span className={`w-2 h-2 rounded-full mt-2 mr-2 flex-shrink-0 ${
-                            theme === 'dark' ? 'bg-red-400' : 'bg-red-500'
-                          }`}></span>
-                          {threat}
-                        </li>
+                        <div key={index} className="flex items-start space-x-2">
+                          <AlertCircle size={16} className="text-red-400 mt-0.5 flex-shrink-0" />
+                          <span className={`text-sm ${
+                            theme === 'dark' ? 'text-red-300' : 'text-red-600'
+                          }`}>{threat}</span>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                   </div>
                 </div>
               </div>

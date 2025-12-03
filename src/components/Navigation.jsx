@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Waves, Settings, MessageCircle, FileText, Package, Image, User, Moon, Sun, ChevronDown } from 'lucide-react';
+import { Settings, MessageCircle, FileText, Package, Image, User, Moon, Sun, ChevronDown } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
 const Navigation = () => {
@@ -63,19 +63,11 @@ const Navigation = () => {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400 }}
           >
-            <Link to="/dashboard" className="flex items-center space-x-3">
-              <div className="relative">
-                <motion.div
-                  className="w-10 h-10 bg-gradient-to-r from-cyan-600 to-ocean-600 rounded-lg flex items-center justify-center"
-                >
-                  <Waves className="text-white" size={20} />
-                </motion.div>
-              </div>
+            <Link to="/dashboard" className="flex items-center">
               <div>
                 <h1 className={`text-xl font-bold ${theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'}`}>
                   JAL NETRA
                 </h1>
-                
               </div>
             </Link>
           </motion.div>
