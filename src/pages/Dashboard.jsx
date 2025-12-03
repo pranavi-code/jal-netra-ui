@@ -58,7 +58,7 @@ const Dashboard = () => {
     <div className={`min-h-screen relative overflow-hidden ${
       theme === 'dark' 
         ? 'bg-underwater-gradient' 
-        : 'bg-gradient-to-br from-slate-50 via-white to-blue-50'
+        : 'bg-light-underwater-gradient'
     }`}>
       <Navigation />
       
@@ -153,8 +153,8 @@ const Dashboard = () => {
                   <Link to={card.path}>
                     <div className={`p-8 transition-all duration-500 group relative overflow-hidden rounded-2xl border ${
                       theme === 'dark' 
-                        ? 'bg-deepSea-800/50 border-cyan-500/30 hover:border-cyan-400/50 backdrop-blur-md' 
-                        : 'bg-white/90 border-slate-200 hover:border-blue-400 shadow-lg hover:shadow-xl backdrop-blur-sm'
+                        ? 'bg-deepSea-800/30 border-cyan-500/30 hover:border-cyan-400/50 backdrop-blur-md' 
+                        : 'bg-white/60 border-slate-200 hover:border-blue-400 shadow-lg hover:shadow-xl backdrop-blur-sm'
                     }`}>
                       {/* Background gradient effect */}
                       <motion.div

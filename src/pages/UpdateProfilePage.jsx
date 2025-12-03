@@ -41,7 +41,7 @@ const UpdateProfilePage = () => {
     <div className={`min-h-screen ${
       theme === 'dark' 
         ? 'bg-underwater-gradient' 
-        : 'bg-gradient-to-br from-slate-50 via-white to-blue-50'
+        : 'bg-light-underwater-gradient'
     }`}>
       <Navigation />
       

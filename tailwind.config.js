@@ -60,8 +60,9 @@ module.exports = {
         }
       },
       backgroundImage: {
-        'underwater-gradient': 'linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #0c4a6e  50%, #164e63 75%, #0f172a 100%)',
-        'ocean-depth': 'linear-gradient(180deg, #164e63 0%, #0c4a6e 50%, #0f172a 100%)',
+        'underwater-gradient': 'linear-gradient(135deg, rgba(15, 23, 42, 0.2) 0%, rgba(30, 41, 59, 0.3) 25%, rgba(12, 74, 110, 0.25) 50%, rgba(22, 78, 99, 0.3) 75%, rgba(15, 23, 42, 0.2) 100%)',
+        'light-underwater-gradient': 'linear-gradient(135deg, rgba(241, 245, 249, 0.15) 0%, rgba(255, 255, 255, 0.2) 25%, rgba(59, 130, 246, 0.1) 50%, rgba(148, 163, 184, 0.15) 75%, rgba(241, 245, 249, 0.1) 100%)',
+        'ocean-depth': 'linear-gradient(180deg, rgba(22, 78, 99, 0.4) 0%, rgba(12, 74, 110, 0.3) 50%, rgba(15, 23, 42, 0.2) 100%)',
         'cyber-glow': 'linear-gradient(45deg, #06b6d4, #22d3ee, #67e8f9)',
         'submarine-path': 'linear-gradient(90deg, transparent 0%, rgba(34, 211, 238, 0.3) 50%, transparent 100%)'
       },

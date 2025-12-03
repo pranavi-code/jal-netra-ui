@@ -89,7 +89,7 @@ const OperationsConsole = () => {
 
   return (
     <div className={`min-h-screen ${
-      theme === 'dark' ? 'bg-underwater-gradient' : 'bg-gradient-to-br from-slate-50 via-white to-blue-50'
+      theme === 'dark' ? 'bg-transparent' : 'bg-white/10'
     }`}>
       <Navigation />
       
@@ -124,72 +124,103 @@ const OperationsConsole = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
           >
-            {/* Upload Area */}
-            <div className="underwater-card p-6">
-              <h3 className={`text-xl font-semibold mb-4 flex items-center ${
-                theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
-              }`}>
-                <ImageIcon className="mr-2" size={20} />
-                Image Upload
-              </h3>
-              
-              <div
-                {...getRootProps()}
-                className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-300 ${
-                  isDragActive
-                    ? 'border-cyan-400 bg-cyan-400/10'
-                    : 'border-cyan-500/30 hover:border-cyan-400/50 hover:bg-cyan-400/5'
-                }`}
-              >
-                <input {...getInputProps()} />
-                
-                <motion.div
-                  animate={{
-                    y: isDragActive ? -5 : 0,
-                    scale: isDragActive ? 1.05 : 1
-                  }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  <Upload className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
-                  
-                  {uploadedImage ? (
-                    <div className="space-y-2">
-                      <p className={`${theme === 'dark' ? 'text-cyan-200' : 'text-slate-700'}`}>Image uploaded successfully!</p>
-                      <p className={`text-sm ${theme === 'dark' ? 'text-cyan-300/60' : 'text-slate-500'}`}>Click to change image</p>
-                    </div>
-                  ) : isDragActive ? (
-                    <p className={`${theme === 'dark' ? 'text-cyan-200' : 'text-slate-700'}`}>Drop the image here...</p>
-                  ) : (
-                    <div className="space-y-2">
-                      <p className={`${theme === 'dark' ? 'text-cyan-200' : 'text-slate-700'}`}>Drag & drop your underwater image here</p>
-                      <p className={`text-sm ${theme === 'dark' ? 'text-cyan-300/60' : 'text-slate-500'}`}>or click to browse files</p>
-                      <p className={`text-xs ${theme === 'dark' ? 'text-cyan-400/50' : 'text-slate-400'}`}>Supports: JPEG, PNG, GIF, BMP</p>
-                    </div>
-                  )}
-                </motion.div>
-              </div>
-            </div>
+            <h2 className={`text-xl font-semibold mb-6 ${
+              theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
+            }`}>Image Upload</h2>
 
-            {/* Upload Button */}
-            <motion.button
-              onClick={processImage}
-              disabled={!uploadedImage || isProcessing}
-              className="w-full btn-primary text-lg py-4"
-              whileHover={uploadedImage && !isProcessing ? { scale: 1.02 } : {}}
-              whileTap={uploadedImage && !isProcessing ? { scale: 0.98 } : {}}
-            >
-              {isProcessing ? (
-                <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
-                  Processing...
+            <div className="flex-1 flex flex-col justify-center">
+              {!uploadedImage ? (
+                <div {...getRootProps()} className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors cursor-pointer flex flex-col items-center justify-center h-full ${
+                  isDragActive
+                    ? theme === 'dark'
+                      ? 'border-cyan-400 bg-cyan-400/10'
+                      : 'border-blue-400 bg-blue-50'
+                    : theme === 'dark'
+                      ? 'border-cyan-500/30 hover:border-cyan-400/50'
+                      : 'border-slate-300 hover:border-blue-400'
+                }`}>
+                  <input {...getInputProps()} />
+                  <Upload className={`mx-auto mb-4 ${
+                    theme === 'dark' ? 'text-cyan-400' : 'text-slate-500'
+                  }`} size={48} />
+                  <p className={`mb-4 ${
+                    theme === 'dark' ? 'text-cyan-300/80' : 'text-slate-600'
+                  }`}>Drop your underwater image here or click to upload</p>
+                  <label className="btn-primary cursor-pointer inline-block">
+                    Choose Image
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (event) => {
+                            setUploadedImage(event.target.result);
+                            setResult(null);
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="hidden"
+                    />
+                  </label>
                 </div>
               ) : (
-                <div className="flex items-center justify-center">
-                  <Activity className="mr-2" size={20} />
-                  Process Image
+                <div className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <h3 className={`text-sm font-medium mb-2 ${
+                        theme === 'dark' ? 'text-cyan-300' : 'text-slate-700'
+                      }`}>Original</h3>
+                      <img
+                        src={uploadedImage}
+                        alt="Original"
+                        className="w-full h-48 object-cover rounded-lg border border-cyan-500/20"
+                      />
+                    </div>
+                    <div>
+                      <h3 className={`text-sm font-medium mb-2 ${
+                        theme === 'dark' ? 'text-cyan-300' : 'text-slate-700'
+                      }`}>Enhanced</h3>
+                      <div className={`w-full h-48 rounded-lg border border-cyan-500/20 flex items-center justify-center ${
+                        theme === 'dark' ? 'bg-deepSea-900/50' : 'bg-slate-100'
+                      }`}>
+                        {isProcessing ? (
+                          <div className="text-center">
+                            <div className="animate-spin w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full mx-auto mb-2"></div>
+                            <p className={`text-sm ${
+                              theme === 'dark' ? 'text-cyan-300' : 'text-slate-600'
+                            }`}>Processing...</p>
+                          </div>
+                        ) : (
+                          <p className={`text-sm ${
+                            theme === 'dark' ? 'text-cyan-400/60' : 'text-slate-500'
+                          }`}>Click process to enhance</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <button
+                      onClick={() => setUploadedImage(null)}
+                      className="btn-secondary"
+                    >
+                      Upload New Image
+                    </button>
+                    <button
+                      onClick={processImage}
+                      disabled={isProcessing}
+                      className="btn-primary flex items-center space-x-2"
+                    >
+                      <Activity size={16} />
+                      <span>Start Analysis</span>
+                    </button>
+                  </div>
                 </div>
               )}
-            </motion.button>
+            </div>
           </motion.div>
 
           {/* Right Column - Processing Pipeline */}
@@ -285,73 +316,69 @@ const OperationsConsole = () => {
         <AnimatePresence>
           {result && (
             <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.8 }}
-              className="mt-12 space-y-8"
+              className="underwater-card p-6 mt-8"
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.6 }}
             >
-              {/* Image Comparison */}
-              <div className="grid md:grid-cols-2 gap-8">
-                <div className="underwater-card p-6">
-                  <h3 className={`text-lg font-semibold mb-4 ${
-                    theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
-                  }`}>Original Image</h3>
-                  <div className="aspect-video bg-deepSea-700 rounded-lg overflow-hidden">
-                    <img
-                      src={result.originalImage}
-                      alt="Original"
-                      className="w-full h-full object-cover"
-                    />
+              <h2 className={`text-xl font-semibold mb-6 ${
+                theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
+              }`}>Analysis Results</h2>
+
+              {/* Images Comparison - Full Width */}
+              <div className="mb-8">
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="text-center">
+                    <p className={`text-sm mb-2 ${
+                      theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'
+                    }`}>Original</p>
+                    <div className="w-full h-64 rounded-lg overflow-hidden border border-cyan-500/20">
+                      <img
+                        src={result.originalImage}
+                        alt="Original"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   </div>
-                </div>
-
-                <div className="underwater-card p-6">
-                  <h3 className={`text-lg font-semibold mb-4 ${
-                    theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'
-                  }`}>Enhanced + Threats Detected</h3>
-                  <div className="aspect-video bg-deepSea-700 rounded-lg overflow-hidden relative">
-                    <img
-                      src={result.enhancedImage}
-                      alt="Enhanced"
-                      className="w-full h-full object-cover"
-                    />
-                    {/* Mock bounding boxes for threats */}
-                    <div className="absolute top-4 left-4 w-16 h-16 border-2 border-red-400 bg-red-400/20 rounded"></div>
-                    <div className="absolute bottom-8 right-8 w-20 h-12 border-2 border-orange-400 bg-orange-400/20 rounded"></div>
-                  </div>
-
-                  <p className={`text-sm mt-3 ${
-                    theme === 'dark' ? 'text-cyan-300/80' : 'text-slate-600'
-                  }`}>{result.enhancement}</p>
-                </div>
-
-                {/* Metrics and Threats */}
-                <div className="space-y-6">
-                  {/* Quality Metrics */}
-                  <div>
-                    <h4 className={`font-medium mb-2 ${
-                      theme === 'dark' ? 'text-cyan-200' : 'text-slate-700'
-                    }`}>Enhancement Quality</h4>
-                    <p className={`${theme === 'dark' ? 'text-cyan-300/80' : 'text-slate-600'}`}>{result.enhancement}</p>
-                  </div>
-
-                  {/* Threats */}
-                  <div>
-                    <h3 className={`text-lg font-medium mb-4 ${
-                      theme === 'dark' ? 'text-cyan-200' : 'text-slate-700'
-                    }`}>Threats Detected</h3>
-                    <div className="space-y-2">
-                      {result.threats.map((threat, index) => (
-                        <div key={index} className="flex items-start space-x-2">
-                          <AlertCircle size={16} className="text-red-400 mt-0.5 flex-shrink-0" />
-                          <span className={`text-sm ${
-                            theme === 'dark' ? 'text-red-300' : 'text-red-600'
-                          }`}>{threat}</span>
-                        </div>
-                      ))}
+                  <div className="text-center">
+                    <p className={`text-sm mb-2 ${
+                      theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'
+                    }`}>Enhanced</p>
+                    <div className="w-full h-64 rounded-lg overflow-hidden border border-cyan-500/20">
+                      <img
+                        src={result.enhancedImage}
+                        alt="Enhanced"
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Metrics Cards - Three Columns */}
+              <div className="grid grid-cols-3 gap-4">
+                {[
+                  { label: 'SSIM', value: result.metrics.ssim, unit: '', color: 'text-green-400' },
+                  { label: 'UQIM', value: result.metrics.uqim, unit: '', color: 'text-blue-400' },
+                  { label: 'PSNR', value: result.metrics.psnr, unit: 'dB', color: 'text-yellow-400' }
+                ].map((metric) => (
+                  <div
+                    key={metric.label}
+                    className={`p-6 rounded-lg border text-center ${
+                      theme === 'dark'
+                        ? 'border-slate-700 bg-slate-800/40'
+                        : 'border-slate-200 bg-white/60'
+                    }`}
+                  >
+                    <p className={`text-sm mb-2 ${
+                      theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'
+                    }`}>{metric.label}</p>
+                    <p className={`text-2xl font-mono font-bold ${metric.color}`}>
+                      {metric.value.toFixed(2)}{metric.unit}
+                    </p>
+                  </div>
+                ))}
               </div>
 
               {/* Metrics Section */}
@@ -390,4 +417,4 @@ const OperationsConsole = () => {
   );
 };
 
-export default OperationsConsole;
+export default OperationsConsole; 
