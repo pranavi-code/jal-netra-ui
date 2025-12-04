@@ -24,12 +24,8 @@ const LandingPage = () => {
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     setIsLoading(false);
-    setShowTransition(true);
-    
-    // Show transition animation for 5 seconds then navigate
-    setTimeout(() => {
-      navigate('/dashboard');
-    }, 5000);
+    // Navigate immediately to maintain video continuity
+    navigate('/dashboard');
   };
 
   const handleSignup = async (e) => {
@@ -42,11 +38,8 @@ const LandingPage = () => {
     setIsLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1500));
     setIsLoading(false);
-    setShowTransition(true);
-    
-    setTimeout(() => {
-      navigate('/dashboard');
-    }, 5000);
+    // Navigate immediately to maintain video continuity
+    navigate('/dashboard');
   };
 
   // Enhanced floating elements
@@ -318,13 +311,9 @@ const LandingPage = () => {
     </motion.div>
   );
 
-  if (showTransition) {
-    return <TransitionAnimation />;
-  }
-
   return (
     <div className={`min-h-screen relative overflow-hidden ${
-      theme === 'dark' ? 'bg-underwater-gradient' : 'bg-light-underwater-gradient'
+      theme === 'dark' ? 'bg-slate-900' : 'bg-gray-50'
     }`}>
       {/* Enhanced Background Effects */}
       <div className="absolute inset-0 overflow-hidden">

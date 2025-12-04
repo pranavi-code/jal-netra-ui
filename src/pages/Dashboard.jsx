@@ -60,6 +60,45 @@ const Dashboard = () => {
         ? 'bg-underwater-gradient' 
         : 'bg-light-underwater-gradient'
     }`}>
+      {/* Background video - only for dashboard */}
+      <video 
+        autoPlay 
+        muted 
+        loop 
+        playsInline 
+        preload="auto"
+        className="fixed inset-0 w-full h-full object-cover z-[-2] pointer-events-none"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          zIndex: -2
+        }}
+      >
+        <source src={`${process.env.PUBLIC_URL}/video.mp4`} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+
+      {/* Semi-transparent overlay - only for dashboard */}
+      <div 
+        className="fixed inset-0 pointer-events-none transition-colors duration-200"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: theme === 'dark' 
+            ? 'rgba(15, 23, 42, 0.25)' 
+            : 'rgba(255, 255, 255, 0.20)',
+          zIndex: -1
+        }}
+        aria-hidden="true"
+      ></div>
+
       <Navigation />
       
       {/* Background Effects */}

@@ -43,7 +43,7 @@ const DockerPage = () => {
 
   return (
     <div className={`min-h-screen ${
-      theme === 'dark' ? 'bg-underwater-gradient' : 'bg-light-underwater-gradient'
+      theme === 'dark' ? 'bg-slate-900' : 'bg-gray-50'
     }`}>
       <Navigation />
       

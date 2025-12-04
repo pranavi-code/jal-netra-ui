@@ -87,7 +87,7 @@ const ChangePasswordPage = () => {
     <div className={`min-h-screen ${
       theme === 'dark' 
         ? 'bg-underwater-gradient' 
-        : 'bg-light-underwater-gradient'
+        : 'bg-gray-50'
     }`}>
       <Navigation />
       

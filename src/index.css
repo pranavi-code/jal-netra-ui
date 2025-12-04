@@ -166,36 +166,6 @@
   }
 }
 
-/* Background video + overlay styles (minimal, theme-aware) */
-#bg-video {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: -2; /* behind overlay and app content */
-  pointer-events: none; /* allow clicks through video */
-}
-
-#bg-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: -1; /* above video, below app content */
-  pointer-events: none; /* don't block interactions */
-  transition: background-color 200ms ease;
-  /* Default gentle translucent layer for readability */
-  background-color: rgba(0,0,0,0.35);
-}
-
-/* Theme-aware overlay colors: keeps existing light/dark logic intact */
-.dark #bg-overlay {
-  background-color: rgba(0, 6, 12, 0.45);
-}
-
-.light #bg-overlay {
-  background-color: rgba(255, 255, 255, 0.35);
-}
-
 /* Small accessibility improvement: ensure root content sits above overlay */
 #root {
   position: relative;
