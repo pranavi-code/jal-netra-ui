@@ -16,6 +16,17 @@ export async function enhanceImage(file) {
   return response.data;
 }
 
+export async function enhanceVideo(file) {
+  const formData = new FormData();
+  formData.append('video', file);
+
+  const url = `${API_BASE}/enhance_video`;
+  const response = await axios.post(url, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data; // { video_url, video_file, metrics }
+}
+
 export async function apiHealth() {
   const url = `${API_BASE}/health`;
   const res = await axios.get(url);

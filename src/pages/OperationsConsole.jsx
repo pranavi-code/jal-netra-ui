@@ -8,6 +8,7 @@ import { useTheme } from '../contexts/ThemeContext';
 const OperationsConsole = () => {
   const { theme } = useTheme();
   const [uploadedImage, setUploadedImage] = useState(null);
+  const [isVideo, setIsVideo] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingSteps, setProcessingSteps] = useState([
     { id: '1', name: 'Uploaded Image', status: 'pending' },
@@ -53,6 +54,7 @@ const OperationsConsole = () => {
 
     // Set mock result (lower quality metrics to indicate poorer quality)
     setResult({
+      isVideo,
       originalImage: uploadedImage,
       enhancedImage: uploadedImage,
       metrics: {
@@ -79,18 +81,34 @@ const OperationsConsole = () => {
   const onDrop = useCallback((acceptedFiles) => {
     const file = acceptedFiles[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setUploadedImage(event.target.result);
+      if (file.type && file.type.startsWith('video')) {
+        const url = URL.createObjectURL(file);
+        setUploadedImage(url);
+        setIsVideo(true);
         setResult(null);
-      };
-      reader.readAsDataURL(file);
+      } else {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          setUploadedImage(event.target.result);
+          setResult(null);
+        };
+        reader.readAsDataURL(file);
+        setIsVideo(false);
+      }
     }
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: { 'image/*': [] },
+    accept: { 
+      'image/*': [],
+      'video/*': [],
+      '.xtf': [],
+      '.sdf': [],
+      '.s7k': [],
+      '.raw': [],
+      '.kcd': []
+    },
     multiple: false
   });
 
@@ -162,7 +180,7 @@ const OperationsConsole = () => {
                 <p className={`mb-2 text-sm ${
                   theme === 'dark' ? 'text-cyan-300' : 'text-slate-700'
                 }`}>
-                  {isDragActive ? 'Drop the image here' : 'Drag & drop an underwater image here'}
+                  {isDragActive ? 'Drop the file here' : 'Drag & drop an underwater image, video, or sonar file here'}
                 </p>
                 <p className={`text-xs mb-3 ${
                   theme === 'dark' ? 'text-cyan-400/60' : 'text-slate-500'
@@ -276,11 +294,11 @@ const OperationsConsole = () => {
               <div className="flex justify-between items-center mb-6">
                 <h2 className={`text-xl font-semibold ${theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'}`}>Analysis Results</h2>
                 <a
-                  href={result.enhancedImage}
-                  download="enhanced-image.jpg"
+                  href={result.isVideo ? result.enhancedImage : result.enhancedImage}
+                  download={result.isVideo ? 'enhanced-video.mp4' : 'enhanced-image.jpg'}
                   className="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-800"
                 >
-                  <span>Download Enhanced Image</span>
+                  <span>{result.isVideo ? 'Download Enhanced Video' : 'Download Enhanced Image'}</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                     <polyline strokeLinecap="round" strokeLinejoin="round" points="7,10 12,15 17,10" />
@@ -297,11 +315,15 @@ const OperationsConsole = () => {
                       theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'
                     }`}>Original</p>
                     <div className="w-full h-64 rounded-lg overflow-hidden border border-cyan-500/20">
-                      <img
-                        src={result.originalImage}
-                        alt="Original"
-                        className="w-full h-full object-cover"
-                      />
+                      {result.isVideo ? (
+                        <video src={result.originalImage} autoPlay muted loop playsInline className="w-full h-full object-cover" />
+                      ) : (
+                        <img
+                          src={result.originalImage}
+                          alt="Original"
+                          className="w-full h-full object-cover"
+                        />
+                      )}
                     </div>
                   </div>
                   <div className="text-center">
@@ -309,11 +331,15 @@ const OperationsConsole = () => {
                       theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'
                     }`}>Enhanced</p>
                     <div className="w-full h-64 rounded-lg overflow-hidden border border-cyan-500/20">
-                      <img
-                        src={result.enhancedImage}
-                        alt="Enhanced"
-                        className="w-full h-full object-cover"
-                      />
+                      {result.isVideo ? (
+                        <video src={result.enhancedImage} autoPlay muted loop playsInline className="w-full h-full object-cover" />
+                      ) : (
+                        <img
+                          src={result.enhancedImage}
+                          alt="Enhanced"
+                          className="w-full h-full object-cover"
+                        />
+                      )}
                     </div>
                   </div>
                 </div>

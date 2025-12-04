@@ -9,7 +9,12 @@
 /coverage
 *.pth
 backend/weights/
+backend/outputs/
+backend/temp/
 
+/backend/weights/
+/backend/outputs/
+/backend/temp/
 # production
 /build
 

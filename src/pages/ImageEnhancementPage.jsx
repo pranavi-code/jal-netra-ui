@@ -6,8 +6,9 @@ import { useTheme } from '../contexts/ThemeContext';
 
 const ImageEnhancementPage = () => {
   const { theme } = useTheme();
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null); // can be image dataURL or video object URL
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isVideo, setIsVideo] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingSteps, setProcessingSteps] = useState([
     { id: '1', name: 'Uploaded Image', status: 'pending' },
@@ -20,11 +21,18 @@ const ImageEnhancementPage = () => {
   const handleImageUpload = (event) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setSelectedImage(e.target?.result);
-      };
-      reader.readAsDataURL(file);
+      if (file.type && file.type.startsWith('video')) {
+        const url = URL.createObjectURL(file);
+        setSelectedImage(url);
+        setIsVideo(true);
+      } else {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setSelectedImage(e.target?.result);
+        };
+        reader.readAsDataURL(file);
+        setIsVideo(false);
+      }
       setSelectedFile(file); // Save the actual file for processing
     }
   };
@@ -59,8 +67,13 @@ const ImageEnhancementPage = () => {
     // Call backend
     let enhancedData = null;
     try {
-      const { enhanceImage } = await import('../services/enhancementApi');
-      enhancedData = await enhanceImage(selectedFile); // Use the actual file
+      if (isVideo) {
+        const { enhanceVideo } = await import('../services/enhancementApi');
+        enhancedData = await enhanceVideo(selectedFile);
+      } else {
+        const { enhanceImage } = await import('../services/enhancementApi');
+        enhancedData = await enhanceImage(selectedFile);
+      }
     } catch (e) {
       console.error('Enhancement failed', e);
     }
@@ -69,16 +82,32 @@ const ImageEnhancementPage = () => {
     setProcessingSteps(prev => prev.map(p => ({ ...p, status: 'completed' })));
 
     // Set result (fallback to original if enhancement failed)
-    setResult({
-      originalImage: selectedImage,
-      enhancedImage: (enhancedData && enhancedData.image) || selectedImage,
-      metrics: {
-        ssim: enhancedData?.metrics?.ssim ?? 0.0,
-        uqim: enhancedData?.metrics?.uqi ?? 0.0,
-        psnr: enhancedData?.metrics?.psnr ?? 0.0
-      },
-      filePath: enhancedData?.file
-    });
+    if (isVideo) {
+      const base = process.env.REACT_APP_API_URL || 'http://127.0.0.1:5000';
+      setResult({
+        isVideo: true,
+        originalVideo: selectedImage,
+        enhancedVideo: enhancedData?.video_url ? `${base}${enhancedData.video_url}` : selectedImage,
+        metrics: {
+          ssim: enhancedData?.metrics?.ssim ?? 0.0,
+          uqim: enhancedData?.metrics?.uqi ?? 0.0,
+          psnr: enhancedData?.metrics?.psnr ?? 0.0
+        },
+        filePath: enhancedData?.video_file
+      });
+    } else {
+      setResult({
+        isVideo: false,
+        originalImage: selectedImage,
+        enhancedImage: (enhancedData && enhancedData.image) || selectedImage,
+        metrics: {
+          ssim: enhancedData?.metrics?.ssim ?? 0.0,
+          uqim: enhancedData?.metrics?.uqi ?? 0.0,
+          psnr: enhancedData?.metrics?.psnr ?? 0.0
+        },
+        filePath: enhancedData?.file
+      });
+    }
 
     setIsProcessing(false);
 
@@ -157,7 +186,7 @@ const ImageEnhancementPage = () => {
                   <p className={`mb-2 text-sm ${
                     theme === 'dark' ? 'text-cyan-300' : 'text-slate-700'
                   }`}>
-                    Drag & drop an underwater image here
+                    Drag & drop an underwater image, video, or sonar file here
                   </p>
                   <p className={`text-xs mb-3 ${
                     theme === 'dark' ? 'text-cyan-400/60' : 'text-slate-500'
@@ -183,7 +212,7 @@ const ImageEnhancementPage = () => {
                   )}
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/*,video/*,.xtf,.sdf,.s7k,.raw,.kcd"
                     onChange={handleImageUpload}
                     className="hidden"
                   />
@@ -275,11 +304,11 @@ const ImageEnhancementPage = () => {
               <div className="flex justify-between items-center mb-8">
                 <h2 className={`text-xl font-semibold ${theme === 'dark' ? 'text-cyan-100' : 'text-slate-800'}`}>Analysis Results</h2>
                 <a
-                  href={result.enhancedImage}
-                  download="enhanced-image.jpg"
+                  href={result.isVideo ? result.enhancedVideo : result.enhancedImage}
+                  download={result.isVideo ? 'enhanced-video.mp4' : 'enhanced-image.jpg'}
                   className="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-800"
                 >
-                  <span>Download Enhanced Image</span>
+                  <span>{result.isVideo ? 'Download Enhanced Video' : 'Download Enhanced Image'}</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                     <polyline strokeLinecap="round" strokeLinejoin="round" points="7,10 12,15 17,10" />
@@ -289,19 +318,27 @@ const ImageEnhancementPage = () => {
               </div>
 
               <div className="max-w-screen-xl mx-auto">
-                {/* Images row - centered, equal size */}
+                {/* Media row - centered, equal size */}
                 <div className="flex gap-8 mb-8">
                   <div className="flex-1 flex flex-col items-center">
                     <p className={`text-sm mb-3 text-center ${theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'}`}>Original</p>
                     <div className="w-full rounded-lg overflow-hidden border border-cyan-500/20 h-80 flex items-center justify-center">
-                      <img src={result.originalImage} alt="Original" className="w-full h-full object-cover" />
+                      {result.isVideo ? (
+                        <video src={result.originalVideo} autoPlay muted loop playsInline className="w-full h-full object-cover" />
+                      ) : (
+                        <img src={result.originalImage} alt="Original" className="w-full h-full object-cover" />
+                      )}
                     </div>
                   </div>
 
                   <div className="flex-1 flex flex-col items-center">
                     <p className={`text-sm mb-3 text-center ${theme === 'dark' ? 'text-cyan-300/70' : 'text-slate-600'}`}>Enhanced</p>
                     <div className="w-full rounded-lg overflow-hidden border border-cyan-500/20 h-80 flex items-center justify-center">
-                      <img src={result.enhancedImage} alt="Enhanced" className="w-full h-full object-cover" />
+                      {result.isVideo ? (
+                        <video src={result.enhancedVideo} autoPlay muted loop playsInline className="w-full h-full object-cover" />
+                      ) : (
+                        <img src={result.enhancedImage} alt="Enhanced" className="w-full h-full object-cover" />
+                      )}
                     </div>
                   </div>
                 </div>
